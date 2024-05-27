@@ -20,50 +20,54 @@ namespace my_list {
 		Node* _next;
 	 };
 
-	template<class T>
+	template<class T, class Ref, class Ptr>
 	struct ListIterator {
 		typedef Node<T> Node;
-		typedef ListIterator<T> iterator;
+		typedef ListIterator<T, Ref, Ptr> iterator;
 
 		// 初始化
-		ListIterator(const Node*& node) {
+		ListIterator(Node* const node) {
 			_node = node;
 		}
 
 		// *
-		T& operator*() {
+		Ref operator*() {
 			return _node->_val;
 		}
 
 		// ++前置
 		iterator operator++() {
-			return _node->next;
+			_node = _node->_next;
+			return _node;
+
+			// return _node->next; 这样做的话，_node指针本身的指向并未变化，所以引发死循环
 		}
 		// 后置++
 		iterator operator++(int) {
 			Node* temp = _node;
-			_node = _node->next;
+			_node = _node->_next;
 			return temp;
 		}
 
 		// --前置
 		iterator operator--() {
-			return _node->prev;
+			_node = _node->_prev;
+			return _node;
 		}
 		// 后置--
 		iterator operator--(int) {
 			Node* temp = _node;
-			_node = _node->prev;
+			_node = _node->_prev;
 			return temp;
 		}
 
 		// ==
 		bool operator==(iterator it) {
-			return _node == it._nodel;
+			return _node == it._node;
 		}
 		// != 
 		bool operator!=(iterator it) {
-			return !(*this == it);
+			return _node != it._node;
 		}
 
 		// 成员变量
@@ -73,8 +77,9 @@ namespace my_list {
 	template<class T>
 	class list {
 		 typedef Node<T> Node;
-		 typedef ListIterator<T> iterator;
 	public:
+		typedef ListIterator<T, T&, T*> iterator;
+		typedef ListIterator<T, const T&, const T*> const_iterator;
 		
 		//迭代器
 		iterator begin() {
@@ -83,22 +88,124 @@ namespace my_list {
 		iterator end() {
 			return _head;
 		}
+		const_iterator begin() const {
+			return _head->_next;
+		}
+		const_iterator end() const {
+			return _head;
+		}
+
+		// 返回大小
+		size_t size() const {
+			return _size;
+		}
+
+		// 清除函数
+		void clear() {
+			iterator it = begin();
+			while (it != _head) {
+				it = erase(it);
+			}
+		}
+
+		// 析构函数
+		~list() {
+			clear();
+			delete _head;
+			_head = nullptr;
+		}
 
 		// 构造函数
 		list()
 			:_head(new Node)
 		{
-			_head->next = _head;
-			_head->prev = _head;
+			_head->_next = _head;
+			_head->_prev = _head;
 			_size = 0;
+		}
+
+		template<class InputIterator>
+		list(InputIterator first, InputIterator last) 
+			:_head(new Node)
+		{
+			_head->_next = _head;
+			_head->_prev = _head;
+			_size = 0;
+
+			while (first != last) {
+				push_back(*first);
+				first++;
+			}
+		}
+
+		// 拷贝构造函数
+		list(list<T>& lt)
+			:_head(new Node)
+		{
+			_head->_next = _head;
+			_head->_prev = _head;
+			_size = 0;
+
+			for (auto e : lt) {
+				push_back(e);
+			}
+		}
+
+		// 赋值重载
+		list<T>& operator=(list<T> lt) {
+			clear();
+			for (auto e : lt) {
+				push_back(e);
+			}
+
+			return *this;
 		}
 
 		// 插入函数
 		void insert(iterator pos, const T& val) {
+			Node* cur = pos._node;
 			Node* node = new Node(val);
-			Node* prev = pos--;
+			Node* prev = cur->_prev;
 
+			node->_next = cur;
+			cur->_prev = node;
+			prev->_next = node;
+			node->_prev = prev;
 
+			_size += 1;
+		}
+
+		// 头插
+		void push_front(const T& val) {
+			insert(begin(), val);
+		}
+
+		// 尾插
+		void push_back(const T& val) {
+			insert(end(), val);
+		}
+
+		// 删除函数
+		iterator erase(iterator pos) {
+			Node* node = pos._node;
+			Node* prev = node->_prev;
+			Node* next = node->_next;
+
+			prev->_next = next;
+			next->_prev = prev;
+			_size -= 1;
+
+			return next;
+		}
+
+		// 尾删
+		void pop_back() {
+			erase(--end());
+		}
+
+		// 头删
+		void pop_front() {
+			erase(begin());
 		}
 
 	private:
