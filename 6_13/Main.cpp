@@ -1,5 +1,5 @@
-#include <iostream>
-using namespace std;
+#include "BST.h"
+using namespace BST;
 
 //class A {
 //public:
@@ -37,45 +37,85 @@ using namespace std;
 //	return 0;
 //}
 
-class Solution {
-public:
-    TreeNode* FindLeftMax(TreeNode* node) {
-        if (node->right == nullptr) return node;
-        else return FindLeftMax(node->right);
-    }
+//class Solution {
+//public:
+//    TreeNode* FindLeftMax(TreeNode* node) {
+//        if (node->right == nullptr) return node;
+//        else return FindLeftMax(node->right);
+//    }
+//
+//    TreeNode* deleteNode(TreeNode* root, int key) {
+//        if (root == nullptr) return root;
+//
+//        TreeNode* parent = root;
+//        TreeNode* child = root;
+//        while (child != nullptr && child->val != key) {
+//            parent = child;
+//            if (child->val > key) {
+//                child = child->left;
+//            }
+//            else {
+//                child = child->right;
+//            }
+//        }
+//
+//        if (parent == nullptr) return root;
+//        if (child->left == nullptr && child->right == nullptr) {
+//            parent->left = child->left;
+//        }
+//        else if (child->left != nullptr && child->right == nullptr) {
+//            parent->left = child->left;
+//        }
+//        else if (child->left == nullptr && child->right != nullptr) {
+//            parent->right = child->right;
+//        }
+//        else {
+//            TreeNode* leftMax = FindLeftMax(child);
+//            swap(parent->val, leftMax->val);
+//            child = leftMax;
+//        }
+//
+//        delete child;
+//        return root;
+//    }
+//};
 
-    TreeNode* deleteNode(TreeNode* root, int key) {
-        if (root == nullptr) return root;
+void test_1() {
+	BSTree<int> tree;
+	tree.insert(1);
+	tree.insert(2);
+	tree.insert(4);
+	tree.insert(3);
 
-        TreeNode* parent = root;
-        TreeNode* child = root;
-        while (child != nullptr && child->val != key) {
-            parent = child;
-            if (child->val > key) {
-                child = child->left;
-            }
-            else {
-                child = child->right;
-            }
-        }
+	tree.InOrder();
+}
 
-        if (parent == nullptr) return root;
-        if (child->left == nullptr && child->right == nullptr) {
-            parent->left = child->left;
-        }
-        else if (child->left != nullptr && child->right == nullptr) {
-            parent->left = child->left;
-        }
-        else if (child->left == nullptr && child->right != nullptr) {
-            parent->right = child->right;
-        }
-        else {
-            TreeNode* leftMax = FindLeftMax(child);
-            swap(parent->val, leftMax->val);
-            child = leftMax;
-        }
+void test_2() {
+	BSTree<int> tree;
+	tree.insert(1);
+	tree.insert(2);
+	tree.insert(4);
+	tree.insert(3);
 
-        delete child;
-        return root;
-    }
-};
+	TreeNode<int>* p = tree.find(2);
+	cout << p->val << endl;
+}
+
+void test_3() {
+	BSTree<int> tree;
+	tree.insert(1);
+
+	tree.erase(1);
+	tree.InOrder();
+}
+
+void test_4() {
+}
+
+int main() {
+	// test_1();
+	// test_2();
+	test_3();
+	// test_4();
+	return 0;
+}
