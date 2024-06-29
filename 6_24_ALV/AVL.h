@@ -102,6 +102,7 @@ namespace myAVL {
 		void RotateLR(Node* parent) {
 			Node* subL = parent->_left;
 			Node* subLR = subL->_right;
+			int bf = subLR->_bf; // 记录该节点的平衡因子
 
 			// 左旋
 			RotateL(subL);
@@ -109,7 +110,6 @@ namespace myAVL {
 			RotateR(parent);
 
 			// 更新平衡因子,三种情况
-			int bf = subLR->_bf;
 			subLR->_bf = 0;
 			if (bf == 1) {
 				parent->_bf = 0;
@@ -209,7 +209,10 @@ namespace myAVL {
 					break;
 				}
 				// 先右旋再左旋
-				else if (parent->_bf == 2 && cur->_bf == -1) {}
+				else if (parent->_bf == 2 && cur->_bf == -1) {
+					RotateRL(parent);
+					break;
+				}
 
 				// 更新指针的指向
 				cur = parent;
@@ -245,17 +248,96 @@ namespace myAVL {
 			return node->_kv.second; // 返回值的引用
 		}
 
+		void adjust_up_bf(Node* parent, Node* child) {
+			while (parent) {
+				// 记录并更新平衡因子
+				int old_bf = parent->_bf;
+				if (parent->_left == child) { parent->_bf++; }
+				else { parent->_bf--; }
+				
+				// 该节点原来的的平衡因子为 0,直接退出
+				if (old_bf == 0) { break; }
+				
+				// 判断是否需要旋转，以及旋转方式:
+				if (parent->_bf == 2 || parent->_bf == -2) {
+					// 如何旋转取决于，另一边孩子
+					// 左旋
+					if (parent->_left == child) {
+						if (parent->_bf == 2 && parent->_right->_bf == 1) {
+							Node* subR = parent->_right;
+							RotateL(parent);
+							// 更新结点
+							parent = subR->_parent;
+							child = subR;
+							continue;
+						}
+						// 先右旋再左旋
+						else if(parent->_bf == 2 && parent->_right->_bf == -1){
+							Node* subRL = parent->_right->_left;
+							RotateRL(parent);
+							// 更新结点
+							parent = subRL->_parent;
+							child = subRL;
+							continue;
+						}
+						// 特殊情况为 0，这种情况可以直接旋转后退出
+						else if (parent->_bf == 2 && parent->_right->_bf == 0) {
+							Node* subR = parent->_right;
+							RotateL(parent);
+							// 更新平衡因子
+							subR->_bf = -1;
+							subR->_left->_bf = 1;
+							break;
+						}
+					}
+					else {
+						// 右旋
+						if (parent->_bf == -2 && parent->_left->_bf == -1) {
+							Node* subL = parent->_left;
+							RotateR(parent);
+							// 更新结点
+							parent = subL->_parent;
+							child = subL;
+							continue;
+						}
+						// 左旋再右旋
+						else if (parent->_bf == -2 && parent->_left->_bf == 1) {
+							Node* subLR = parent->_left->_right;
+							RotateLR(parent);
+							// 更新结点
+							parent = subLR->_parent;
+							child = subLR;
+							continue;
+						}
+						// 特殊情况为 0，这种情况可以直接旋转后退出
+						else if (parent->_bf == -2 && parent->_left->_bf == 0) {
+							Node* subL = parent->_left;
+							RotateR(parent);
+							// 更新平衡因子
+							subL->_bf = 1;
+							subL->_right->_bf = -1;
+							break;
+						}
+					}
+				}
+				// 更新节点
+				child = parent;
+				parent = parent->_parent;
+			}
+		}
+
 		bool erase(const K& key) {
 			if (_root == nullptr) return false;
 
 			Node* parent = _root;
 			Node* cur = _root;
 			while (cur) {
-				parent = cur; // 更新父节点
 				if (cur->_kv.first > key) { // 比该节点小
+					parent = cur;
 					cur = cur->_left;
 				}
 				else if (cur->_kv.first < key) { // 比该节点大
+					parent = cur;
 					cur = cur->_right;
 				}
 				else { // 找到该节点
@@ -266,12 +348,13 @@ namespace myAVL {
 			if (cur == nullptr) return false;
 			// 叶子结点的处理
 			if (cur->_left == nullptr && cur->_right == nullptr) {
-				if (cur == _root) _root = nullptr; // 是否是根节点
+				if (cur == _root) { _root = nullptr; } // 是否是根节点
 
-				if (parent->_left == cur) parent->_left = nullptr;
-				else parent->_right = nullptr;
+				if (parent->_left == cur) { parent->_left = nullptr; }
+				else { parent->_right = nullptr; }
 
 				delete cur;
+				adjust_up_bf(parent, nullptr);
 				return true;
 			}
 			// 左孩子不为空
@@ -286,6 +369,7 @@ namespace myAVL {
 					else parent->_right = cur->_left;
 				}
 				delete cur;
+				adjust_up_bf(parent, parent->_left);
 				return true;
 			}
 			// 右孩子不为空
@@ -300,6 +384,7 @@ namespace myAVL {
 					else parent->_right = cur->_right;
 				}
 				delete cur;
+				adjust_up_bf(parent, parent->_right);
 				return true;
 			}
 			else {
@@ -311,12 +396,15 @@ namespace myAVL {
 					leftMax = leftMax->_right;
 				}
 				// 将删除结点的左节点(如果有托付给父节点)
-				if(leftMax->_left) leftMax->_left->_parent = leftParent; // 该孩子不为空
-				if (leftParent->_left == leftMax) leftParent->_left = leftMax->_left;
-				else leftParent->_right = leftMax->_left;
+				Node* leftMaxRight = leftMax->_left;
+				if(leftMaxRight) leftMaxRight->_parent = leftParent; // 该孩子不为空
+				if (leftParent->_left == leftMax) leftParent->_left = leftMaxRight;
+				else leftParent->_right = leftMaxRight;
 				swap(cur->_kv, leftMax->_kv);
 
 				delete leftMax;
+				adjust_up_bf(leftParent, leftMaxRight);
+				return true;
 			}
 		}
 
