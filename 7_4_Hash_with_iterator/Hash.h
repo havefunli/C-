@@ -4,7 +4,6 @@
 using namespace std;
 
 namespace myHash {
-
 	// 哈希函数
 	template<class T>
 	struct HashFunc {
@@ -27,17 +26,103 @@ namespace myHash {
 		}
 	};
 
+	// 前置声明
+	template<class K, class T, class KeyOfT, class Hash>
+	class HashBucket;
+
+	template<class T>
+	struct Elem {
+		Elem(const T& val = T()) {
+			_val = val;
+		}
+
+		T _val;
+		Elem* _next = nullptr;
+	};
+
 	template<class Key, class T, class KeyOfT, class Hash>
-	class HashBucket {
-		struct Elem {
-			Elem(const T& val = T()) {
-				_val = val;
+	struct _HTIterator {
+
+		typedef Elem<T> Elem;
+		typedef _HTIterator Self;
+		typedef HashBucket<Key, T, KeyOfT, Hash>* PtrForHT;
+
+		_HTIterator(Elem* node, PtrForHT pht) 
+			: _node(node)
+			, _pht(pht)
+		{}
+
+		Elem* _node = nullptr;
+		PtrForHT _pht = nullptr;
+
+		T& operator* () {
+			return _node->_val;
+		}
+
+		T* operator->() {
+			return &(_node->_val);
+		}
+
+		bool operator!=(const Self& it) {
+			if (it._node != _node) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		Self& operator++() {
+			// 当前节点并未完成
+			if (_node->_next) {
+				_node = _node->_next;
+			}
+			// 当前结点以及遍历完成
+			else {
+				KeyOfT _kot;
+				Hash _hs;
+
+				size_t table_size = _pht->_ht.size();
+				size_t hashi = (_hs(_kot(_node->_val)) % table_size) + 1;
+				for (; hashi < table_size; ++hashi) {
+					if (_pht->_ht[hashi] != nullptr) {
+						_node = _pht->_ht[hashi];
+						break;
+					}
+				}
+				if (hashi == table_size) {
+					_node = nullptr;
+				}
 			}
 
-			T _val;
-			Elem* _next = nullptr;
-		};
+			return *this;
+		 }
+	};
+
+	template<class Key, class T, class KeyOfT, class Hash>
+	class HashBucket {
+		// 前置声明友元类
+		template<class K, class T, class KeyOfT, class Hash>
+		friend struct _HTIterator;
+
+		typedef Elem<T> Elem;
 	public:
+
+		typedef _HTIterator<Key, T, KeyOfT, Hash> iterator;
+		
+		iterator begin() {
+			for (size_t i = 0; i < _ht.size(); ++i) {
+				if (_ht[i]) {
+					return iterator(_ht[i], this);
+				}
+			}
+			return end();
+		}
+
+		iterator end() {
+			return iterator(nullptr, this);
+		}
+
 		HashBucket(size_t capacity = 10)
 			: _ht(capacity, nullptr)
 			, _size(0)
@@ -56,17 +141,19 @@ namespace myHash {
 		}
 
 		// 插入
-		bool Insert(const T& val) {
+		pair<iterator, bool> Insert(const T& val) {
 			// 哈希值
 			Hash _hs;
 			// 仿函数，因为不确定 val 的类型
 			KeyOfT _kt;
-			if (Find(_kt(val))) return false;
+
+			iterator it = Find(_kt(val));
+			if (it != end()) return { it, false };
 
 			Elem* newnode = new Elem(val);
 
 			// 如果超过负载因子，则扩容
-			if (_size * 10 / _ht.size() > 10) {
+			if (_size >= _ht.size()) {
 				vector<Elem*> _temp(_ht.size() * 2, nullptr);
 
 				for (size_t i = 0; i < _ht.size(); ++i) {
@@ -91,13 +178,13 @@ namespace myHash {
 			_ht[hashi] = newnode;
 			_size++;
 
-			return true;
+			return make_pair(iterator(newnode, this), true);
 		}
 
 		// 删除
 		bool Erase(const Key& key) {
 			Hash _hs;
-			size_t hashi = _hs(key);
+			size_t hashi = _hs(key) % _ht.size();
 
 			KeyOfT _kt;
 			Elem* cur = _ht[hashi];
@@ -127,7 +214,7 @@ namespace myHash {
 		}
 
 		// 查找
-		Elem* Find(const Key& key) {
+		iterator Find(const Key& key) {
 			Hash _hs;
 			KeyOfT _kt;
 			
@@ -136,12 +223,12 @@ namespace myHash {
 
 			while (cur != nullptr) {
 				if (_kt(cur->_val) == key) {
-					return cur;
+					return iterator(cur, this);
 				}
 				cur = cur->_next;
 			}
 
-			return nullptr;
+			return iterator(nullptr, this);
 		}
 
 	private:
