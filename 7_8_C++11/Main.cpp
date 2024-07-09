@@ -1,86 +1,207 @@
-#include <iostream>
+ï»¿#include <iostream>
+#include <vector>
 using namespace std;
 
+//void test_1() {
+//	int A = 1;
+//	int B = 2;
+//
+//	auto Swap1 = [](int& left, int& right)
+//		{
+//			int temp = left;
+//			left = right;
+//			right = temp;
+//		};
+//
+//	Swap1(A, B);
+//
+//	// æ•æ‰å‚æ•°(é»˜è®¤ä¼ å€¼æ•æ‰)
+//	// mutable å¯ä»¥ä¿®æ”¹ä¼ å€¼å¯¹è±¡
+//	auto Swap2 = [&A, &B]() mutable
+//		{
+//			int temp = A;
+//			A = B;
+//			B = temp;
+//		};
+//	Swap2();
+//}
+//
+//void test_2() {
+//	int A = 1;
+//	int B = 2;
+//	int C = 3;
+//
+//	// ä¼ å€¼æ•æ‰æ‰€æœ‰çš„å˜é‡
+//	auto Func1 = [=]()->int 
+//		{
+//			return A + B + C;
+//		};
+//
+//	cout << Func1() << endl;
+//
+//	// ä¼ å¼•ç”¨æ•æ‰æ‰€æœ‰çš„å˜é‡
+//	auto Func2 = [&]()->int
+//		{
+//			return A + B + C;
+//		};
+//
+//	cout << Func2() << endl;
+//
+//	// ä¼ å€¼ï¼Œä¼ å¼•ç”¨æ··åˆæ•æ‰æ‰€æœ‰çš„å˜é‡
+//	auto Func3 = [&, B]()->int
+//		{
+//			return A + B + C;
+//		};
+//
+//	cout << Func3() << endl;
+//}
+//
+//// æ²¡æœ‰å®ç°ææ„ï¼Œæ‹·è´æ„é€ ï¼Œèµ‹å€¼é‡è½½çš„ä»»æ„ä¸€ä¸ª
+//// å°±ä¼šç”Ÿæˆä¸€ä¸ªé»˜è®¤çš„ç§»åŠ¨æ„é€ 
+//// å¯¹äºå†…ç½®ç±»å‹é€å­—èŠ‚æ‹·è´ï¼Œè‡ªå®šä¹‰ç±»å‹è°ƒç”¨æ‹·è´æ„é€ 
+//
+//// å¯¹ä¸æƒ³è¢«è°ƒç”¨çš„å‡½æ•°
+//// å¯ä»¥ç§æœ‰åŒ–
+//// ä¹Ÿå¯ä»¥åŠ ä¸Š delete è¡¨ç¤ºåˆ é™¤
+//class A {
+//public:
+//	A(const int& a) = delete;
+//private:
+//	int _a = 1;
+//};
+//
+//template<class ...Args>
+//void Printf(Args... args) {
+//	cout << sizeof...(args) << endl;
+//}
+//
+//void test_3() {
+//	Printf("abcd", 2);
+//}
+//
+//void test_4() {
+//	vector<pair<string, int>> v;
+//	v.push_back({"abcd", 1}); // æ„é€ ->æ‹·è´æ„é€ 
+//	// ä¼šç›´æ¥åˆ©ç”¨è¯¥å‚æ•°å»åˆå§‹åŒ–ç»“ç‚¹çš„å€¼
+//	v.emplace_back("abcd", 1); // æ„é€ 
+//}
+//
+//void test_5() {
+//	auto A = 1;
+//	cout << typeid(A).name() << endl;
+//
+//
+//}
+
+//int main() {
+//	// test_1();
+//	// test_2();
+//	// test_3();
+//	// test_4();
+//	test_5();
+//	return 0;
+//}
+
+
 void test_1() {
-	int A = 1;
-	int B = 2;
-
-	auto Swap1 = [](int& left, int& right)
-		{
-			int temp = left;
-			left = right;
-			right = temp;
-		};
-
-	Swap1(A, B);
-
-	// ²¶×½²ÎÊı(Ä¬ÈÏ´«Öµ²¶×½)
-	// mutable ¿ÉÒÔĞŞ¸Ä´«Öµ¶ÔÏó
-	auto Swap2 = [&A, &B]() mutable
-		{
-			int temp = A;
-			A = B;
-			B = temp;
-		};
-	Swap2();
+	vector<int> arr = { 1, 2, 3 ,4 };
+	
+	for (auto e : arr) {
+		cout << e << " ";
+	}
+	cout << endl;
 }
 
 void test_2() {
-	int A = 1;
-	int B = 2;
-	int C = 3;
+	vector<int> arr = { 1, 2, 3 ,4 };
 
-	// ´«Öµ²¶×½ËùÓĞµÄ±äÁ¿
-	auto Func1 = [=]()->int 
-		{
-			return A + B + C;
-		};
+	for (auto e : arr) {
+		++e;
+	}
 
-	cout << Func1() << endl;
-
-	// ´«ÒıÓÃ²¶×½ËùÓĞµÄ±äÁ¿
-	auto Func2 = [&]()->int
-		{
-			return A + B + C;
-		};
-
-	cout << Func2() << endl;
-
-	// ´«Öµ£¬´«ÒıÓÃ»ìºÏ²¶×½ËùÓĞµÄ±äÁ¿
-	auto Func3 = [&, B]()->int
-		{
-			return A + B + C;
-		};
-
-	cout << Func3() << endl;
-}
-
-// Ã»ÓĞÊµÏÖÎö¹¹£¬¿½±´¹¹Ôì£¬¸³ÖµÖØÔØµÄÈÎÒâÒ»¸ö
-// ¾Í»áÉú³ÉÒ»¸öÄ¬ÈÏµÄÒÆ¶¯¹¹Ôì
-// ¶ÔÓÚÄÚÖÃÀàĞÍÖğ×Ö½Ú¿½±´£¬×Ô¶¨ÒåÀàĞÍµ÷ÓÃ¿½±´¹¹Ôì
-
-// ¶Ô²»Ïë±»µ÷ÓÃµÄº¯Êı
-// ¿ÉÒÔË½ÓĞ»¯
-// Ò²¿ÉÒÔ¼ÓÉÏ delete ±íÊ¾É¾³ı
-class A {
-public:
-	A(const int& a) = delete;
-private:
-	int _a = 1;
-};
-
-template<class ...Args>
-void Printf(Args... args) {
-	cout << sizeof...(args) << endl;
+	for (auto e : arr) {
+		cout << e << " ";
+	}
+	cout << endl;
 }
 
 void test_3() {
-	Printf("abcd", 2);
+	vector<int> arr = { 1, 2, 3 ,4 };
+
+	auto it = arr.begin();
+	while (it != arr.end()) {
+		cout << *it << " ";
+		++it;
+	}
 }
 
-int main() {
+class Test {
+public:
+	Test(int A, int B) {
+		_A = A;
+		_B = B;
+	}
+private:
+	int _A;
+	int _B;
+};
+
+void test_4() {
+	int arr[] = { 1, 2, 3, 4 };
+	Test t1 = { 1, 2 };
+}
+
+void test_5() {
+	// å¯¹å†…ç½®ç±»å‹åˆå§‹åŒ–
+	int A = { 1 };
+	int B{ 2 }; // ç”šè‡³å¯ä»¥å»é™¤ = 
+
+	vector<int> arr = { 1, 2, 3, 4 };
+
+	// å¯¹è‡ªå®šä¹‰ç±»å‹åˆå§‹åŒ–
+	Test t2{ 1, 2 };
+
+	// å¯¹ new è¡¨è¾¾å¼åˆå§‹åŒ–
+	int* ptr = new int[2] {1, 2};
+	delete[] ptr;
+}
+
+class Base final {
+public:
+	virtual void Func1() {
+		cout << "Base::Func1()" << endl;
+	}
+
+	void Func2() {
+		cout << "Base::Func2()" << endl;
+	}
+
+private:
+	int _base = 1;
+};
+
+class Derive : public Base{
+public:
+	void Func1() {
+		cout << "Derive::Func1()" << endl;
+	}
+
+private:
+	int _derive = 1;
+};
+
+void test_6() {
+	Derive d = Derive();
+	Base& base = d;
+	base.Func1();
+}
+
+int main()
+{
 	// test_1();
 	// test_2();
-	test_3();
+	// test_3();
+	// test_4();
+	test_6();
 	return 0;
 }
