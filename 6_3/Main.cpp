@@ -20,6 +20,10 @@ int main() {
 			break;
 		case 2:
 			Book_sort();
+			break;
+		case 3:
+			view_all_book();
+			break;
 		}
 	} while (chioce != 4);
 	save_File();

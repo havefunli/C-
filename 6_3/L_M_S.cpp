@@ -24,12 +24,12 @@ namespace mySpace{
 	}
 
 	void sort_menu() {
-		cout << "---------------------" << endl;
-		cout << "----- 0 按照书首字母-----" << endl;
-		cout << "----- 1 按照购买价格-----" << endl;
-		cout << "----- 2 按照购买时间-----" << endl;
-		cout << "------3 退出界面-----" << endl;
-		cout << "---------------------" << endl;
+		cout << "---------------------------" << endl;
+		cout << "------- 0 按照书首字母-----" << endl;
+		cout << "------- 1 按照购买价格-----" << endl;
+		cout << "------- 2 按照购买时间-----" << endl;
+		cout << "--------3 退出界面---------" << endl;
+		cout << "---------------------------" << endl;
 	}
 
 	bool cmp_letter(const Book& left, const Book& right) {
@@ -133,6 +133,7 @@ namespace mySpace{
 
 		string cate;
 		cout << "请输入类别: ";
+		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		cin >> cate;
 		cout << endl;
 
@@ -151,13 +152,24 @@ namespace mySpace{
 
 		double price;
 		while (1) {
-			cout << "请输入价格: ";
-			cin >> price;
-			cout << endl;
-			if (price < 0) {
-				cout << "价格不合法请重新输入：" << endl;
+			std::cout << "请输入价格： ";
+			std::cin >> price;
+			std::cout << std::endl;
+
+			if (std::cin.fail()) {
+				std::cin.clear();
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				std::cout << "价格不合法请重新输入：" << std::endl;
 			}
-			else break;
+			else {
+				// 检查价格是否合法（这里假设价格必须大于等于0）
+				if (price < 0) {
+					std::cout << "价格不合法请重新输入：" << std::endl;
+				}
+				else {
+					break;
+				}
+			}
 		}
 
 
@@ -174,7 +186,8 @@ namespace mySpace{
 		int flag = 0;
 		cout << "请输入你需要删除的书名称：";
 		string del_name;
-		cin >> del_name;
+		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		getline(cin, del_name);
 		cout << endl;
 
 		list<Book>::iterator it = lt.begin();
@@ -192,6 +205,31 @@ namespace mySpace{
 		if (flag == 0) cout << "没有找到你要删除的图书。" << endl;
 	}
 
+	void modify_book() {
+		int flag = 0;
+		string query_name;
+		cout << "请输入你需要修改的书名称：";
+		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		getline(cin, query_name);
+		cout << endl;
+
+		auto it = lt.begin();
+		while (it != lt.end()) {
+			if (it->_name == query_name) {
+				flag = 1;
+				cout << *it << endl;
+				break;
+			}
+			it++;
+		}
+
+		if (flag == 0) cout << "没有找到你要的图书。" << endl;
+		else {
+			lt.erase(it);
+			add_book();
+		}
+	}
+
 	void Library_management() {
 		int chioce = 0;
 		do {
@@ -205,6 +243,9 @@ namespace mySpace{
 				break;
 			case 1:
 				del_book();
+				break;
+			case 2:
+				modify_book();
 				break;
 			}
 		} while (chioce != 3);
@@ -228,22 +269,24 @@ namespace mySpace{
 		return output;
 	}
 
-	void Book_query() {
+	bool Book_query() {
 		int flag = 0;
-		cout << "请输入你需要查询的书名称：";
 		string query_name;
-		cin >> query_name; 
+		cout << "请输入你需要查询的书名称：";
+		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		getline(cin, query_name);
 		cout << endl;
 
 		for (auto& book : lt) {
 			if (book._name == query_name) {
 				flag = 1;
 				cout << book << endl;
-				break;
+				return true;
 			}
 		}
 
 		if(flag == 0) cout << "没有找到你要的图书。" << endl;
+		return false;
 	}
 
 	void Book_sort() {

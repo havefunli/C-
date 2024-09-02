@@ -109,6 +109,42 @@ void test_9() {
 	v2.Print();
 }
 
+void test_10() {
+	my_Vector::vector<string> v;
+	v.push_back("ABC");
+	v.push_back("ABC");
+	v.push_back("ABC");
+	v.push_back("ABC");
+	v.push_back("ABC");
+	v.Print();
+}
+
+void test_11() {
+	vector<int> v = { 1, 2, 3, 4, 5 };
+	vector<int>::iterator it = v.begin() + 1;
+	it = v.erase(it);
+
+	for (auto e : v) {
+		cout << e << " ";
+	}
+	cout << endl;
+
+	cout << *it << endl;
+}
+
+void test_12() {
+	my_Vector::vector<string> v;
+	v.push_back("ABC");
+	v.push_back("ABC");
+	v.push_back("ABC");
+	v.push_back("ABC");
+	v.push_back("ABC");
+	for (auto e : v) {
+		cout << e << " ";
+	}
+	cout << endl;
+}
+
 int main() {
 	// test_1();
 	// test_2();
@@ -118,7 +154,10 @@ int main() {
 	// test_6();
 	// test_7();
 	// test_8();
-	test_9();
+	// test_9();
+	// test_10();
+	// test_11();
+	test_12();
 
 	return 0;
 }

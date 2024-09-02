@@ -104,7 +104,8 @@ namespace my_Space{
 	void String::push_back(char ch) {
 		// еп╤о©у╪Д
 		if (_size == _capacity) {
-			reserve(2 * _capacity);
+			int capacity = _capacity == 0 ? 1 : _capacity;
+			reserve(2 * capacity);
 		}
 		
 		_str[_size] = ch;

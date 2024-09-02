@@ -32,6 +32,10 @@ namespace my_list {
 			_node = node;
 		}
 
+		//ListIterator() {
+		//	_node = nullptr;
+		//}
+
 		// *
 		Ref operator*() {
 			return _node->_val;
@@ -80,9 +84,9 @@ namespace my_list {
 	struct Reverse_iterator{
 		typedef Reverse_iterator<iterator, Ref, Ptr> r_iterator;
 
-		Reverse_iterator(iterator it) {
-			_it = it;
-		}
+		Reverse_iterator(iterator it)
+			:_it(it)
+		{}  // _it = it; 自定义类型在初始化列表初始化。iterator没有默认构造函数，因此出错
 
 		// *
 		Ref operator*() {
@@ -273,16 +277,14 @@ namespace my_list {
 		Node* _head;
 		size_t _size;
 	};
-
-	template<class T>
-	class Test {
-	public:
-		Test() {
-			val = 1;
-		}
-		void Print1();
-
-	private:
-		T val;
-	};
 }
+
+class my_class {
+public:
+	my_class(int A = 1);
+
+	void Print();
+
+private:
+	int _A;
+};

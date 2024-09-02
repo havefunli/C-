@@ -5,7 +5,22 @@
 using namespace std;
 
 namespace LQ {
-	template<class T, class Container = vector<T>>
+	// 比较大小仿函数
+	template<class T> 
+	struct Less {
+		bool operator()(const T& left, const T& right) {
+			return left < right;
+		}
+	};
+	template<class T>
+	struct Greater {
+		bool operator()(const T& left, const T& right) {
+			return left > right;
+		}
+	};
+
+
+	template<class T, class Container = vector<T>, class Compare = Less<T>>
 	class priority_queue {
 	public:
 		// 初始化函数
@@ -19,15 +34,15 @@ namespace LQ {
 			}
 		}
 
-		// 向下调整(用于删除最大元素后)
+		// 向下调整(用于删除最 大/小 后)
 		void adjust_down(size_t parent) {
 			size_t child = 2 * parent + 1;
 
 			while (child < size()) {
-				if (child + 1 < size() && _con[child + 1] > _con[child]) {
+				if (child + 1 < size() && Compare()(_con[child + 1], _con[child])) {
 					child = child + 1;
 				}
-				if (_con[child] > _con[parent]) {
+				if (Compare()(_con[child], _con[parent])) {
 					swap(_con[child], _con[parent]);
 					parent = child;
 					child = 2 * parent + 1;
@@ -38,13 +53,12 @@ namespace LQ {
 			}
 		}
 
-
 		// 向上调整(用于插入元素后调整)
 		void adjust_up(size_t child) {
 			int parent = (child - 1) / 2;
 
 			while (parent >= 0) {
-				if (_con[child] > _con[parent]) {
+				if (Compare()(_con[child], _con[parent])) {
 					swap(_con[child], _con[parent]);
 					child = parent;
 					parent = (child - 1) / 2;

@@ -19,7 +19,9 @@ namespace mySpace{
 
 		friend void del_book();
 		friend void save_File();
-		friend void Book_query();
+		friend bool Book_query();
+		friend void modify_book();
+
 
 		friend bool cmp_letter(const Book& left, const Book& right);
 		friend bool cmp_price(const Book& left, const Book& right);
@@ -43,12 +45,13 @@ namespace mySpace{
 
 	void add_book();
 	void del_book();
+	void modify_book();
 	void Library_management();
 
 	void read_File();
 	void save_File();
 
-	void Book_query();
+	bool Book_query();
 	void Book_sort();
 	void view_all_book();
 

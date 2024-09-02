@@ -45,7 +45,7 @@ void backtrack(int k, vector<vector<int>>& attack, vector<string>& Queen, vector
             Queen[k][i] = 'Q'; // 将该位置的字符换成 Q
             place_Queen(k, i, attack); // 将对应位置置为 1
 
-            // 回溯
+            // 递归
             backtrack(k + 1, attack, Queen, solve);
 
             attack = temp;

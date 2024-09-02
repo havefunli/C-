@@ -18,7 +18,7 @@ void knapsack(vector<int>& weights, int T, vector<int>& selected, vector<vector<
 
 int main() {
     vector<int> weights = { 1,8,4,3,5,2 };
-    int T = 10;
+    int T = 15;
     vector<int> selected;
     vector<vector<int>> result;
 

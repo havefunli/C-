@@ -56,7 +56,11 @@ namespace my_Vector {
 				size_t old_size = size();
 
 				T* temp = new T[n];
-				memcpy(temp, _start, size() * sizeof(T));
+				//memcpy(temp, _start, size() * sizeof(T));
+				for (int i = 0; i < size(); i++) {
+					temp[i] = _start[i];
+				}
+				delete[] _start;
 				
 				_start = temp;
 				_end = _start + old_size;

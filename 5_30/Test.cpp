@@ -14,10 +14,7 @@ public:
 void test_1() {
 	int A = 1;
 	int B = 2;
-
-	Less<int> lessfuc;
-	cout << lessfuc(A, B) << endl;
-	cout << lessfuc.operator()(A, B) << endl;
+	
 	cout << Less<int>()(A, B) << endl;
 	cout << Less<int>().operator()(A, B) << endl;
 }
@@ -34,7 +31,7 @@ void test_3() {
 }
 
 void test_4() {
-	LQ::priority_queue<int> pq;
+	LQ::priority_queue<int, vector<int>, LQ::Greater<int>> pq;
 	pq.push(1);
 	pq.push(2);
 	pq.push(4);
