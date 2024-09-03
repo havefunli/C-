@@ -1,0 +1,5 @@
+﻿  Main.cpp
+C:\Users\acer\Desktop\C++\9_3_C++11\Main.cpp(213,21): error C2275: “AddClass”: 应为表达式而不是类型
+C:\Users\acer\Desktop\C++\9_3_C++11\Main.cpp(213,31): error C2062: 意外的类型“int”
+C:\Users\acer\Desktop\C++\9_3_C++11\Main.cpp(213,62): error C2143: 语法错误: 缺少“;”(在“AddFunc”的前面)
+C:\Users\acer\Desktop\C++\9_3_C++11\Main.cpp(213,62): warning C4551: 缺少参数列表的函数调用
