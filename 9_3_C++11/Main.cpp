@@ -199,6 +199,12 @@ struct Addobject
 	}
 };
 
+template<class T>
+T AddTle(const T& left, const T& right)
+{
+	return left + right;
+}
+
 class AddClass
 {
 public:
@@ -208,9 +214,26 @@ public:
 	}
 };
 
+
 int main()
 {
-	std::function<int(AddClass*, int, int)> func1 = AddClass::AddFunc;
+	std::function<int(int, int)> func1 = std::bind(&AddClass::AddFunc, AddClass(), std::placeholders::_1, std::placeholders::_2);
+	std::cout << func1(1, 2) << std::endl;
 
 	return 0;
 }
+
+//double my_divide(double x, double y) { return x / y; }
+//
+//int main()
+//{
+//	std::cout << my_divide(10, 1) << std::endl; // 普通调用
+//
+//	auto func1 = std::bind(my_divide, 20, std::placeholders::_1); // 绑定一个参数
+//	std::cout << func1(10) << std::endl;
+//
+//	auto func2 = std::bind(my_divide, 20, 10); // 绑定两个参数
+//	std::cout << func2() << std::endl;
+//
+//	return 0;
+//}
