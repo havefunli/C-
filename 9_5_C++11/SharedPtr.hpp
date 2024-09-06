@@ -1,6 +1,9 @@
 #pragma once
+
 #include <iostream>
 #include <atomic>
+#include <stdio.h>
+#include <functional>
 
 // 该智能指针还存在缺陷
 // 当传入的对象是 T[] 时，删除操作存在问题
@@ -8,33 +11,43 @@
 namespace MyPtr
 {
 	template <class T>
-	class SharedPtr 
+	class SharedPtr
 	{
 	private:
 		// 当计数置 0 时调用
 		void destructor()
 		{
-			delete _Ptr; // 缺陷，万一管理的指针时 T[]
+			_Del(_Ptr);
 			_Ptr = nullptr;
 			delete _RefCounts;
 			_RefCounts = nullptr;
 		}
 
 	public:
-		// 构造函数
+		// 构造函数(默认删除器)
 		SharedPtr(T* Ptr)
 			: _Ptr(Ptr)
 			, _RefCounts(new std::atomic<int>(1))
+			, _Del([](T* val) {delete val; })
+		{}
+
+		// 构造函数(自定义删除器)
+		template<class D>
+		SharedPtr(T* Ptr, D Del)
+			: _Ptr(Ptr)
+			, _RefCounts(new std::atomic<int>(1))
+			, _Del(Del)
 		{}
 
 		// 拷贝构造
 		SharedPtr(const SharedPtr<T>& sp)
 			: _Ptr(sp._Ptr)
+			, _RefCounts(sp._RefCounts)
+			, _Del(sp._Del)
 		{
-			// 引用增加
-			++(*sp._RefCounts);
-			_RefCounts = sp._RefCounts;   
+			++(*_RefCounts);
 		}
+
 
 		T& operator* ()
 		{
@@ -58,20 +71,15 @@ namespace MyPtr
 
 		SharedPtr<T>& operator=(const SharedPtr<T>& sp)
 		{
-			// 对自己赋值
-			if (sp._Ptr == _Ptr)
+			if (this != &sp) // 防止自我赋值
 			{
-				return *this;
+				clear(); // 释放当前资源
+
+				_Ptr = sp._Ptr;
+				_RefCounts = sp._RefCounts;
+				_Del = sp._Del; // 复制删除器
+				++(*_RefCounts);
 			}
-
-			// 先释放现在自己占用的资源
-			clear();
-
-			// 绑定新的资源
-			_Ptr = sp._Ptr;
-			_RefCounts = sp._RefCounts;
-			++(*_RefCounts);
-
 			return *this;
 		}
 
@@ -94,5 +102,6 @@ namespace MyPtr
 	private:
 		T* _Ptr;
 		std::atomic<int>* _RefCounts; // 引用计数（保证原子性）
+		std::function<void(T*)> _Del; // 自定义删除器
 	};
 }
